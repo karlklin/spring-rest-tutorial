@@ -1,4 +1,4 @@
-package bookmarks;
+package application.bookmarks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

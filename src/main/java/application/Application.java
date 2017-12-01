@@ -1,5 +1,9 @@
-package bookmarks;
+package application;
 
+import application.bookmarks.Account;
+import application.bookmarks.AccountRepository;
+import application.bookmarks.Bookmark;
+import application.bookmarks.BookmarkRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

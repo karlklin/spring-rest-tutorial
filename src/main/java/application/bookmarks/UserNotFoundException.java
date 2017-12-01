@@ -1,4 +1,4 @@
-package bookmarks;
+package application.bookmarks;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
