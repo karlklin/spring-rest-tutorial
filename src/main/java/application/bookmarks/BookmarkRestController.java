@@ -9,7 +9,7 @@ import java.net.URI;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/{userId}/bookmarks")
+@RequestMapping("/accounts/{userId}/bookmarks")
 class BookmarkRestController {
 
     private final BookmarkRepository bookmarkRepository;
