@@ -7,6 +7,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts/{userId}/bookmarks")
@@ -25,13 +26,16 @@ class BookmarkRestController {
     @RequestMapping(method = RequestMethod.GET)
     Collection<Bookmark> readBookmarks(@PathVariable String userId) {
         this.validateUser(userId);
+
         return this.bookmarkRepository.findByAccountUsername(userId);
     }
     
     @RequestMapping(method = RequestMethod.GET, value = "/{bookmarkId}")
     Bookmark readBookmark(@PathVariable String userId, @PathVariable Long bookmarkId) {
         this.validateUser(userId);
-        return this.bookmarkRepository.findOne(bookmarkId);
+
+        Bookmark bookmark = this.bookmarkRepository.findOne(bookmarkId);
+        return Optional.ofNullable(bookmark).orElseThrow(() -> new BookmarkNotFoundException(userId));
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -50,8 +54,7 @@ class BookmarkRestController {
 
                     return ResponseEntity.created(location).build();
                 })
-                .orElse(ResponseEntity.noContent().build());
-
+                .orElse(ResponseEntity.notFound().build());
     }
 
 
