@@ -17,5 +17,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     // feature 2
     // feature 2.2
     // feature 3
+    // feature 4
     Collection<Bookmark> findByAccountUsername(String username);
 }
