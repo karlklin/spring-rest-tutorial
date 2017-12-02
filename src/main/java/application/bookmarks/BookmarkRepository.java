@@ -13,5 +13,8 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     // Fix 1.1
     // feature 1
     // feature 1.1
+    // finding bookmarks by user
+    // feature 2
+    // feature 2.2
     Collection<Bookmark> findByAccountUsername(String username);
 }
