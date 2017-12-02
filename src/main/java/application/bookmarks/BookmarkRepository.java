@@ -10,5 +10,6 @@ import java.util.Collection;
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     // finding bookmarks by user
     // feature 2
+    // feature 2.2
     Collection<Bookmark> findByAccountUsername(String username);
 }
