@@ -16,6 +16,8 @@ public class Account {
 
     @JsonIgnore
     String password;
+
+    @Column(unique = true)
     String username;
 
     public Account(String name, String password) {
