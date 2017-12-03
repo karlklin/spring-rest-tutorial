@@ -32,7 +32,7 @@ public class AccountRestController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> addAccount(@RequestBody Account account) {
+    public ResponseEntity<?> createAccount(@RequestBody Account account) {
         Account createdAccount = accountRepository.save(new Account(account.username, "password"));
 
         URI location = ServletUriComponentsBuilder
@@ -41,4 +41,16 @@ public class AccountRestController {
 
         return ResponseEntity.created(location).build();
     }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
+    public ResponseEntity<?> deleteAccount(@PathVariable String userId) {
+        Account accountToDelete = accountRepository.findByUsername(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+        accountRepository.delete(accountToDelete);
+
+        // TODO missing response body
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

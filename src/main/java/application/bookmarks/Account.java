@@ -2,10 +2,7 @@ package application.bookmarks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,7 +27,7 @@ public class Account {
     }
 
     @JsonIgnore
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Bookmark> bookmarks = new HashSet<>();
 
     public Set<Bookmark> getBookmarks() {
