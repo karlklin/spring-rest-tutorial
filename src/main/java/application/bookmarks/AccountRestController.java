@@ -48,8 +48,9 @@ public class AccountRestController {
 
         accountRepository.delete(accountToDelete);
 
-        // TODO missing response body
-        return ResponseEntity.noContent().build();
+        // other possibility to return 204 status / no content
+        // ResponseEntity.noContent().build();
+        return ResponseEntity.ok(accountToDelete);
     }
 
 
