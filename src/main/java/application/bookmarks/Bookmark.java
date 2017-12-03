@@ -18,14 +18,17 @@ public class Bookmark {
     @ManyToOne
     private Account account;
 
+    String name;
     String uri;
     String description;
 
     Bookmark() { // jpa only
     }
 
-    public Bookmark(Account account, String uri, String description) {
+    public Bookmark(Account account, String name, String uri, String description) {
+        this.name = name;
         this.uri = uri;
+
         this.description = description;
         this.account = account;
     }
@@ -43,7 +46,9 @@ public class Bookmark {
         return uri;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescription() { return description; }
+
+    public String getName() {
+        return name;
     }
 }

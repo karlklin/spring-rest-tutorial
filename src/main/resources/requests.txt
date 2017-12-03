@@ -1,0 +1,20 @@
+curl -X POST \
+  http://localhost:8080/accounts \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -H 'postman-token: a1dd4702-73bf-6941-0728-e7be2b9277f2' \
+  -d '{
+  "username": "oanacka",
+  "password": "password"
+}'
+
+curl -X POST \
+  http://localhost:8080/accounts/jhoeller/bookmarks \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -H 'postman-token: bf9cc05f-ef0e-b3ba-e354-1bb8f5a5c61e' \
+  -d '{
+  "name": "my_bookmark3_jhoeller",
+  "uri": "http://bookmark.com/3/jhoeller",
+  "description": "A description"
+}'

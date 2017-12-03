@@ -45,7 +45,7 @@ class BookmarkRestController {
         return this.accountRepository
                 .findByUsername(userId)
                 .map(account -> {
-                    Bookmark newBookmark = bookmarkRepository.save(new Bookmark(account,
+                    Bookmark newBookmark = bookmarkRepository.save(new Bookmark(account, input.name,
                             input.uri, input.description));
 
                     URI location = ServletUriComponentsBuilder
