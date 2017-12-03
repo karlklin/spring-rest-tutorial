@@ -29,6 +29,7 @@ public class Account {
     Account() { // jpa only
     }
 
+    @JsonIgnore
     @OneToMany(mappedBy = "account")
     private Set<Bookmark> bookmarks = new HashSet<>();
 
