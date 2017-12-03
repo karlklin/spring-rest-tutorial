@@ -18,8 +18,8 @@ public class Bookmark {
     @ManyToOne
     private Account account;
 
-    public String uri;
-    public String description;
+    String uri;
+    String description;
 
     Bookmark() { // jpa only
     }

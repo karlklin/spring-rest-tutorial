@@ -18,8 +18,8 @@ public class Account {
     private Long id;
 
     @JsonIgnore
-    public String password;
-    public String username;
+    String password;
+    String username;
 
     public Account(String name, String password) {
         this.username = name;
