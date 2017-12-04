@@ -8,12 +8,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/accounts")
 public class AccountRestController {
 
-    private  AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
     public AccountRestController(AccountRepository accountRepository) {
@@ -31,14 +32,54 @@ public class AccountRestController {
         return accountRepository.findByUsername(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
+    // TODO check differences of POST and PUT implementation. POST should be idempotent and it's not here.
+
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> addAccount(@RequestBody Account account) {
-        Account createdAccount = accountRepository.save(new Account(account.username, "password"));
+    public ResponseEntity<?> createAccount(@RequestBody Account account) {
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{userId}")
-                .buildAndExpand(createdAccount.username).toUri();
+        // return 200 OK if present otherwise 201 CREATED
+        return accountRepository.findByUsername(account.username)
+                .map(foundAccount -> ResponseEntity.ok(foundAccount))
+                .orElseGet(() -> {
+                    accountRepository.save(new Account(account.username, "password"));
 
-        return ResponseEntity.created(location).build();
+                    URI location = ServletUriComponentsBuilder
+                            .fromCurrentRequest().path("/{userId}")
+                            .buildAndExpand(account.username).toUri();
+
+                    return ResponseEntity.created(location).build();
+                });
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/{userId}")
+    public ResponseEntity<?> createOrUpdateAccount(@PathVariable String userId, @RequestBody Account account) {
+        Optional<Account> foundAccount = accountRepository.findByUsername(userId);
+
+        // return 200 if modified or 201 if created
+        return accountRepository.findByUsername(userId)
+                .map(fAccount -> {
+                    accountRepository.save(foundAccount.get());
+
+                    return ResponseEntity.ok(foundAccount);})
+                .orElseGet(() -> {
+                    accountRepository.save(new Account(account.username, "password"));
+
+                    URI location = ServletUriComponentsBuilder
+                            .fromCurrentRequest().path("/{userId}")
+                            .buildAndExpand(account.username).toUri();
+
+                    return ResponseEntity.created(location).build();
+                });
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
+    public ResponseEntity<?> deleteAccount(@PathVariable String userId) {
+        Account accountToDelete = accountRepository.findByUsername(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+        accountRepository.delete(accountToDelete);
+
+        // other possibility to return 204 status / no content
+        // ResponseEntity.noContent().build();
+        return ResponseEntity.ok(accountToDelete);
     }
 }
