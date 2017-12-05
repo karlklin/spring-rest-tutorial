@@ -7,23 +7,19 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.mock.http.MockHttpOutputMessage;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.AnnotationConfigWebContextLoader;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,8 +31,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
+@ContextConfiguration(loader = AnnotationConfigWebContextLoader.class, classes = {MvcTestConfig.class})
 public class BookmarkRestControllerTest {
-
 
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -44,9 +40,13 @@ public class BookmarkRestControllerTest {
 
     private MockMvc mockMvc;
 
-    private String userName = "bdussault";
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
-    private HttpMessageConverter mappingJackson2HttpMessageConverter;
+    @Autowired
+    private MvcTestHelper helper;
+
+    private String userName = "bdussault";
 
     private Account account;
 
@@ -55,23 +55,9 @@ public class BookmarkRestControllerTest {
     @Autowired
     private BookmarkRepository bookmarkRepository;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private AccountRepository accountRepository;
-
-    @Autowired
-    void setConverters(HttpMessageConverter<?>[] converters) {
-
-        this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream()
-                .filter(hmc -> hmc instanceof MappingJackson2HttpMessageConverter)
-                .findAny()
-                .orElse(null);
-
-        assertNotNull("the JSON message converter must not be null",
-                this.mappingJackson2HttpMessageConverter);
-    }
 
     @Before
     public void setup() throws Exception {
@@ -88,14 +74,14 @@ public class BookmarkRestControllerTest {
     @Test
     public void userNotFound() throws Exception {
         mockMvc.perform(post("/george/bookmarks/")
-                .content(this.json(new Bookmark()))
+                .content(helper.json(new Bookmark()))
                 .contentType(contentType))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void readSingleBookmark() throws Exception {
-        mockMvc.perform(get(url("/" + userName + "/bookmarks/"
+        mockMvc.perform(get(helper.url("/" + userName + "/bookmarks/"
                 + this.bookmarkList.get(0).getId())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -106,7 +92,7 @@ public class BookmarkRestControllerTest {
 
     @Test
     public void readBookmarks() throws Exception {
-        mockMvc.perform(get(url("/" + userName + "/bookmarks")))
+        mockMvc.perform(get(helper.url("/" + userName + "/bookmarks")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -120,23 +106,12 @@ public class BookmarkRestControllerTest {
 
     @Test
     public void createBookmark() throws Exception {
-        String bookmarkJson = json(new Bookmark(
+        String bookmarkJson = helper.json(new Bookmark(
                 this.account, "bookmark", "http://spring.io", "a bookmark to the best resource for Spring news and information"));
 
-        this.mockMvc.perform(post(url("/" + userName + "/bookmarks"))
+        this.mockMvc.perform(post(helper.url("/" + userName + "/bookmarks"))
                 .contentType(contentType)
                 .content(bookmarkJson))
                 .andExpect(status().isCreated());
-    }
-
-    protected String url(String suffix) {
-        return "/accounts" + suffix;
-    }
-
-    protected String json(Object o) throws IOException {
-        MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
-        this.mappingJackson2HttpMessageConverter.write(
-                o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
-        return mockHttpOutputMessage.getBodyAsString();
     }
 }
