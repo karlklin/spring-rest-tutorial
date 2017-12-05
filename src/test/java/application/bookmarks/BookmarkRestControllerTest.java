@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.AnnotationConfigWebContextLoader;
@@ -14,10 +13,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static application.bookmarks.MvcTestHelper.CONTENT_TYPE;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,10 +33,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @ContextConfiguration(loader = AnnotationConfigWebContextLoader.class, classes = {MvcTestConfig.class})
 public class BookmarkRestControllerTest {
 
-    private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            Charset.forName("utf8"));
-
     private MockMvc mockMvc;
 
     @Autowired
@@ -46,18 +41,17 @@ public class BookmarkRestControllerTest {
     @Autowired
     private MvcTestHelper helper;
 
+    @Autowired
+    private BookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     private String userName = "bdussault";
 
     private Account account;
 
     private List<Bookmark> bookmarkList = new ArrayList<>();
-
-    @Autowired
-    private BookmarkRepository bookmarkRepository;
-
-
-    @Autowired
-    private AccountRepository accountRepository;
 
     @Before
     public void setup() throws Exception {
@@ -73,9 +67,9 @@ public class BookmarkRestControllerTest {
 
     @Test
     public void userNotFound() throws Exception {
-        mockMvc.perform(post("/george/bookmarks/")
+        mockMvc.perform(post(helper.url("/george/bookmarks/"))
                 .content(helper.json(new Bookmark()))
-                .contentType(contentType))
+                .contentType(CONTENT_TYPE))
                 .andExpect(status().isNotFound());
     }
 
@@ -84,7 +78,7 @@ public class BookmarkRestControllerTest {
         mockMvc.perform(get(helper.url("/" + userName + "/bookmarks/"
                 + this.bookmarkList.get(0).getId())))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentType(CONTENT_TYPE))
                 .andExpect(jsonPath("$.id", is(this.bookmarkList.get(0).getId().intValue())))
                 .andExpect(jsonPath("$.uri", is("http://bookmark.com/1/" + userName)))
                 .andExpect(jsonPath("$.description", is("A description")));
@@ -94,7 +88,7 @@ public class BookmarkRestControllerTest {
     public void readBookmarks() throws Exception {
         mockMvc.perform(get(helper.url("/" + userName + "/bookmarks")))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentType(CONTENT_TYPE))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(this.bookmarkList.get(0).getId().intValue())))
                 .andExpect(jsonPath("$[0].uri", is("http://bookmark.com/1/" + userName)))
@@ -110,7 +104,7 @@ public class BookmarkRestControllerTest {
                 this.account, "bookmark", "http://spring.io", "a bookmark to the best resource for Spring news and information"));
 
         this.mockMvc.perform(post(helper.url("/" + userName + "/bookmarks"))
-                .contentType(contentType)
+                .contentType(CONTENT_TYPE)
                 .content(bookmarkJson))
                 .andExpect(status().isCreated());
     }

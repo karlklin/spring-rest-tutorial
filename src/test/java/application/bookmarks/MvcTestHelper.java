@@ -19,7 +19,11 @@ public class MvcTestHelper {
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
     public String url(String suffix) {
-        return "/accounts" + suffix;
+        return url() + suffix;
+    }
+
+    public String url() {
+        return "/accounts";
     }
 
     public String json(Object o) throws IOException {
