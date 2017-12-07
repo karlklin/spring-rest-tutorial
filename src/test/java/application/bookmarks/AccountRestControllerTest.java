@@ -5,11 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.AnnotationConfigWebContextLoader;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -18,17 +17,17 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
-@WebAppConfiguration
-@ContextConfiguration(loader = AnnotationConfigWebContextLoader.class, classes = {MvcTestConfig.class})
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(MvcTestConfig.class)
+@AutoConfigureMockMvc
 public class AccountRestControllerTest {
 
     public static final String OANACKA = "oanacka";
     public static final String KPAWELSKI = "kpawelski";
 
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -45,8 +44,6 @@ public class AccountRestControllerTest {
 
     @Before
     public void setup() throws Exception {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
-
         this.bookmarkRepository.deleteAllInBatch();
         this.accountRepository.deleteAllInBatch();
 
