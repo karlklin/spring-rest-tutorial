@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,15 +13,15 @@ import java.util.Optional;
 @RequestMapping("/accounts")
 public class AccountRestController {
 
+    @Autowired
     private AccountRepository accountRepository;
 
-    @Autowired
-    public AccountRestController(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
-    }
+//    public AccountRestController(AccountRepository accountRepository) {
+//        this.accountRepository = accountRepository;
+//    }
 
     @RequestMapping(method = RequestMethod.GET)
-    public Collection<Account> readAccounts() {
+    public List<Account> readAccounts() {
         List<Account> accounts = accountRepository.findAll();
         return accounts;
     }

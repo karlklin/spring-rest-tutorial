@@ -22,7 +22,7 @@ public class Bookmark {
     String uri;
     String description;
 
-    Bookmark() { // jpa only
+    public Bookmark() { // jpa only
     }
 
     public Bookmark(Account account, String name, String uri, String description) {
