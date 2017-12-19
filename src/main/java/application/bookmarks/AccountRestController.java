@@ -1,6 +1,7 @@
 package application.bookmarks;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -34,9 +35,17 @@ public class AccountRestController {
 
     // TODO check differences of POST and PUT implementation. POST should be idempotent and it's not here.
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> createAccount(@RequestBody Account account) {
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createAccountUsingJson(@RequestBody Account account) {
+        return createAccount(account);
+    }
 
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<?> createAccountUsingFormData(@ModelAttribute Account account) {
+        return createAccount(account);
+    }
+
+    private ResponseEntity<?> createAccount(Account account) {
         // return 200 OK if present otherwise 201 CREATED
         return accountRepository.findByUsername(account.username)
                 .map(foundAccount -> ResponseEntity.ok(foundAccount))
@@ -50,6 +59,7 @@ public class AccountRestController {
                     return ResponseEntity.created(location).build();
                 });
     }
+
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{userId}")
     public ResponseEntity<?> createOrUpdateAccount(@PathVariable String userId, @RequestBody Account account) {
